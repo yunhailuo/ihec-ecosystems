@@ -44,7 +44,8 @@ def shell(cmd, assert_ok=False):
 	for line in p.stdout: #.readlines():
 		logerr(line)
 	exit = p.wait()
-	if assert_ok: exit == 0
+	if assert_ok:
+		assert exit == 0
 	return exit == 0
 
 def mkdirs(path):

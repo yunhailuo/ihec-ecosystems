@@ -109,7 +109,7 @@ def get_test_data(configfile, home):
 
 
 def make_tests():
-	mcf10a = ['cemt0007_h3k27me3_template.json', 'cemt0007_h3k27me3_template.json'] #, './hg38_resources/base_config.json']
+	mcf10a = ['cemt0007_h3k4me3_template.json', 'cemt0007_h3k27me3_template.json'] #, './hg38_resources/base_config.json']
 	config = jloadf('./hg38_resources/base_config.json')
 	base = config['base']
 
@@ -135,7 +135,7 @@ def singularity_pull_image(home, debug=debug_mode):
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
 	else:
 		cmd = 'singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
-		logerr('# ..pulling ' +  cmd + '\n')
+		logerr('# .. ' +  cmd + '\n')
 		shell('singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2', assert_ok = True)
 	
 	images = glob.glob('./*img')
@@ -154,7 +154,7 @@ def singularity_pull_image(home, debug=debug_mode):
 	})
 		
 	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
-	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl')
+	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
 	return {
 		"container_image":image_path,
 		"home" : home,
