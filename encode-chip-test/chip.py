@@ -60,7 +60,9 @@ def get_hg38_resources(home):
 	return base_config
 
 
-def existing_ref_config(config):
+def existing_ref_config(configfile):
+	home = os.path.abspath(os.getcwd())
+	config = jloadf(configfile)
 	hashed = { k : os.path.realpath(config[k]) if k in ['blacklist', 'chrsz', 'ref_fa', 'bwa_idx_tar'] else config[k] for k in config }
 	mkdirs('./hg38_resources')
 	os.chdir('./hg38_resources')
@@ -70,10 +72,10 @@ def existing_ref_config(config):
 				bowtie2_idx_tar	{bowtie2_idx_tar}
 				bwa_idx_tar	{bwa_idx_tar}
 				ref_fa	{ref_fa}'''.format(**hashed).splitlines()  ]) + '\n'
-	logerr( dumpf('./hg38_local.tsv', config) + '\n' )
-	base_config = jdumpf('./base_config.json', { 'chip.genome_tsv' : os.path.abspath('./hg38_local.tsv'), 'base' : base  })
+	logerr( './hg38_resources/' + dumpf('./hg38_local.tsv', config) + '\n' )
+	base_config = jdumpf('./base_config.json', { 'chip.genome_tsv' : os.path.abspath('./hg38_local.tsv'), 'base' : home  })
 	os.chdir(home)
-	return base_config
+	return home  + '/hg38_resources/base_config.json'
 
 
 def rm(target):
@@ -132,8 +134,10 @@ def singularity_pull_image(home, debug=debug_mode):
 	if debug:
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
 	else:
-		pass
-		#shell('singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2', assert_ok = True)
+		cmd = 'singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
+		logerr('# ..pulling ' +  cmd + '\n')
+		shell('singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2', assert_ok = True)
+	
 	images = glob.glob('./*img')
 	assert len(images) == 1
 	image_label = 'chip_seq_pipeline_v2'
@@ -175,7 +179,7 @@ def main(args):
 		get_hg38_resources(home)
 	
 	if '-refconfig' in args:
-		logerr(existing_ref_config('./ref.config.json'))	
+		logerr(existing_ref_config('./ref_config.json') + '\n')	
 
 	if '-get' in args:
 		get_test_data('./test_config.json', home)
