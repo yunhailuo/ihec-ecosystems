@@ -1,5 +1,5 @@
 from utils import logger
-
+import sys
 
 class IHECJsonValidator(object):
 	def __init__(self, validators):
@@ -21,7 +21,13 @@ class IHECJsonValidator(object):
 		for version in self.validators:
 			validator = self.validators[version]
 			valid = validator.validate(attrs, details=attributes)
-			logger("# is valid ihec spec:{0} version:{1} [{2}]\n".format(valid, version if valid else '__invalid__', attributes['title']))
+			title = filter(lambda x: ord(x) < 128, attributes['title'])
+			if attributes['title'] != title:
+				print >> sys.stderr, '#__warn__: unicode found in title',  attributes['title'] 
+
+			print >> sys.stderr, "# is valid ihec spec:{0} version:{1} [".format(valid, version) ,   attributes['title'] , "]" 
+				
+			
 			if valid:
 				return version
 		return None

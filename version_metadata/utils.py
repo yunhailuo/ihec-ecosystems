@@ -9,7 +9,14 @@ class Logger:
 	def __init__(self):
 		pass
 	def __call__(self, m):
-		sys.stderr.write('{0}'.format(m))
+		try:
+			sys.stderr.write('{0}'.format(m))
+		except UnicodeEncodeError as err:
+			#m = map(unicode.strip, m)
+			m =  filter(lambda x: ord(x) < 128, m)  #  ''.join([x for x in   if ord(x) < 128])  #im.encode('ascii', errors='replace')
+			sys.stderr.write('# warn: string contains unicode string'.format(str(m)))
+			sys.stderr.write('{0}'.format(m))
+
 	def warn(self, m):
 		self.__call__(m)
 
