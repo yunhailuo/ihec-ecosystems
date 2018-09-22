@@ -128,12 +128,12 @@ def write_testrun(config):
 	with open('testrun_tasks_template.sh') as infile:
 		logerr(dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/encode_test_tasks_run\n\n'.format(**config)))
+	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/encode_test_tasks_run.sh\n\n'.format(**config)))
 	return dumpf('./singularity_test.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/testrun.sh $1\n\n'.format(**config))
 
 
 
-def singularity_pull_image(home, debug=debug_mode):
+def singularity_pull_image(home, config, debug=debug_mode):
 	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
 	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1'
 	os.chdir('./images')
@@ -142,7 +142,8 @@ def singularity_pull_image(home, debug=debug_mode):
 	else:
 		cmd = 'singularity pull {0}'.format(imageurl)
 		logerr('# .. ' +  cmd + '\n')
-		#shell(cmd, assert_ok = True)
+		if not '-nobuild' in config:
+			shell(cmd, assert_ok = True)
 	
 	images = glob.glob('./*img')
 	assert len(images) == 1
@@ -191,7 +192,7 @@ def main(args):
 		get_test_data('./test_config.json', home)
 	
 	if '-pullimage' in args:
-		container_config = singularity_pull_image(home, debug = False)
+		container_config = singularity_pull_image(home, args, debug = False)
 		container = write_testrun(container_config)
 		logerr('# container: {0}\n'.format(container))
 	
