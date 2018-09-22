@@ -37,7 +37,11 @@ def jloadf(f):
 
 
 def logerr(m):
-		sys.stderr.write('{0}'.format(m))
+	sys.stderr.write('{0}'.format(m))
+
+def logerrn(m):
+	sys.stderr.write('{0}\n'.format(m))
+
 
 def shell(cmd, assert_ok=False):
 	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

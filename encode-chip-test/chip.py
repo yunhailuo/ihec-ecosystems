@@ -125,22 +125,28 @@ def make_tests():
 def write_testrun(config):
 	with open('testrun_template.sh') as infile:
 		logerr(dumpf('{0}/testrun.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
-	return dumpf('./singularity_test.sh', '#!/bin/bash\n\nsingularity exec {container_image} {home}/testrun.sh $1\n\n'.format(**config))
+	with open('testrun_tasks_template.sh') as infile:
+		logerr(dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+	
+	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/encode_test_tasks_run\n\n'.format(**config)))
+	return dumpf('./singularity_test.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/testrun.sh $1\n\n'.format(**config))
 
 
 
 def singularity_pull_image(home, debug=debug_mode):
+	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
+	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1'
 	os.chdir('./images')
 	if debug:
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
 	else:
-		cmd = 'singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
+		cmd = 'singularity pull {0}'.format(imageurl)
 		logerr('# .. ' +  cmd + '\n')
-		shell('singularity pull docker://quay.io/encode-dcc/chip-seq-pipeline:v2', assert_ok = True)
+		#shell(cmd, assert_ok = True)
 	
 	images = glob.glob('./*img')
 	assert len(images) == 1
-	image_label = 'chip_seq_pipeline_v2'
+	image_label = 'chip_seq_pipeline_v_1_1'
 	image_name = '{0}.simg'.format(image_label)
 	logerr('# pulled image: {0}, moved: {1}\n'.format(images[0], image_name))
 	os.rename(images[0], image_name)

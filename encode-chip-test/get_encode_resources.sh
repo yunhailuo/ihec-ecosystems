@@ -20,6 +20,7 @@ ifNotThenWgetAndUntar(){
   fi
 }
 
+
 ifNotThenWget https://github.com/broadinstitute/cromwell/releases/download/34/cromwell-34.jar
 chmod +rx cromwell-34.jar
 
@@ -29,7 +30,14 @@ ifNotThenWgetAndUntar https://storage.googleapis.com/encode-pipeline-test-sample
 
 git clone https://github.com/ENCODE-DCC/chip-seq-pipeline2
 
+git clone https://github.com/ENCODE-DCC/chip-seq-pipeline-test-data.git
+
+mv chip-seq-pipeline-test-data ./chip-seq-pipeline2/test/test_task
+
 echo "#ok"
+
+
+
 
 
 
