@@ -1,5 +1,7 @@
 # ENCODE ChIP-Seq pipeline singularity wrapper
 
+Note: This is out of date. 
+
 ## ENCODE ChIP-Seq pipeline
 
 See https://github.com/ENCODE-DCC/chip-seq-pipeline2/
