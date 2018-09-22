@@ -1,0 +1,36 @@
+#!/bin/bash
+
+
+ifNotThenWget(){
+  fname=$(basename $1)
+  if [ ! -f $fname ]; then
+    wget $1
+  else
+    echo "# $fname exists"
+  fi
+}
+
+ifNotThenWgetAndUntar(){
+  fname=$(basename $1)
+  if [ ! -f $fname ]; then
+    wget $1
+    tar xvf $fname 
+  else
+    echo "# $fname exists"
+  fi
+}
+
+ifNotThenWget https://github.com/broadinstitute/cromwell/releases/download/34/cromwell-34.jar
+chmod +rx cromwell-34.jar
+
+ifNotThenWgetAndUntar https://storage.googleapis.com/encode-pipeline-genome-data/test_genome_database_hg38_chip.tar
+
+ifNotThenWgetAndUntar https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/ENCSR936XTK_fastq_subsampled.tar
+
+git clone https://github.com/ENCODE-DCC/chip-seq-pipeline2
+
+echo "#ok"
+
+
+
+
