@@ -28,9 +28,12 @@ ifNotThenWgetAndUntar https://storage.googleapis.com/encode-pipeline-genome-data
 
 ifNotThenWgetAndUntar https://storage.googleapis.com/encode-pipeline-test-samples/encode-chip-seq-pipeline/ENCSR936XTK/ENCSR936XTK_fastq_subsampled.tar
 
-git clone https://github.com/ENCODE-DCC/chip-seq-pipeline2
+#git clone https://github.com/ENCODE-DCC/chip-seq-pipeline2
+git clone ssh://git@github.com/ENCODE-DCC/chip-seq-pipeline2.git
 
-git clone https://github.com/ENCODE-DCC/chip-seq-pipeline-test-data.git
+
+#git clone https://github.com/ENCODE-DCC/chip-seq-pipeline-test-data.git
+git clone ssh://git@github.com/ENCODE-DCC/chip-seq-pipeline-test-data.git
 
 mv chip-seq-pipeline-test-data ./chip-seq-pipeline2/test/test_task
 

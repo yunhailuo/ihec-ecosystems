@@ -109,9 +109,13 @@ def get_test_data(configfile, home):
 
 
 def make_tests():
-	mcf10a = ['cemt0007_h3k4me3_template.json', 'cemt0007_h3k27me3_template.json'] #, './hg38_resources/base_config.json']
-	config = jloadf('./hg38_resources/base_config.json')
-	base = config['base']
+	mcf10a = ['cemt0007_h3k4me3_template.json', 'cemt0007_h3k27me3_template.json'] 
+	
+	if os.path.isfile('./hg38_resources/base_config.json'):
+		config = jloadf('./hg38_resources/base_config.json')
+		base = config['base']
+	else:
+		base = os.path.abspath(os.getcwd())
 
 	def fix(fname, base):
 		assert fname.endswith('_template.json')
