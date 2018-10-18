@@ -50,7 +50,7 @@ class Utils:
 			uniq.add(e)
 			if len(uniq) > 1:
 				raise Exception('#__nonUniqInDemandUniq:' + str(uniq))
-		if size(uniq) != 1:
+		if len(uniq) != 1:
 			raise Exception('#__nonUniqInDemandUniq:' + str(uniq))
 		return iterable[0]
 	def tryuniq(self, iterable):

@@ -82,7 +82,11 @@ class SRAParseObjSet:
 	def parse_attributes_block(self, obj, objtype):
 		assert objtype in self.expected_obj_tags
 		attrtag = '{0}_ATTRIBUTES'.format(objtype)
-		attrs = cmn.demanduniq(list(obj.findall(attrtag)))
+		attrblock = list(obj.findall(attrtag))
+		if len(attrblock) == 0:
+			logger('__warn__:#no_attributes found\n')
+			return {}
+		attrs = cmn.demanduniq(attrblock)
 		attrhash = defaultdict(list)
 		for e in attrs.getchildren():
 			tag = cmn.demanduniq(e.findall('TAG')).text
