@@ -38,7 +38,7 @@
             "properties": {
                 "experiment_type": {"type": "string", "enum": ["Chromatin Accessibility"]},
                 "experiment_ontology_uri": {"type": "string"},
-                "library_strategy": {"type": "string", "enum": ["DNase-Hypersensitivity"]},
+                "library_strategy": {"type": "string", "enum": ["DNase-Hypersensitivity", "ATAC-seq"]},
                 "molecule_ontology_uri" : {"type": "string"},
                 "molecule" : {"type": "string", "enum": ["genomic DNA"]},
 
@@ -120,7 +120,7 @@
         "chip-seq": {
             "type": "object",
             "properties": {
-                "experiment_type": {"type": "string", "pattern": "^(ChIP-Seq Input)|(Histone H\\w+)+$"},
+                "experiment_type": {"type": "string", "pattern": "^(ChIP-Seq Input)|(Histone H\\w+([\\./]\\w+)?)+$"},
                 "experiment_ontology_uri": {"type": "string"},
                 "library_strategy": {"type": "string", "enum": ["ChIP-Seq"]},
                 "molecule_ontology_uri" : {"type": "string"},
