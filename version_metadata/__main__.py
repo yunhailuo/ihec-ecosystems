@@ -9,7 +9,7 @@ import validate_experiment
 def main(args):
 
 	if not args.has('-config'):
-		args.add_key('-config',  "./config.json")
+		args.add_key('-config',  "./config.json") # should just pull out the path here
 
 	logger(str([args.keys, args.args()]) + '\n')
 
