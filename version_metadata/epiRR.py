@@ -138,54 +138,59 @@ def exp_xml(rr_obj):
 
 
 def exp_type(exp):
-    assay = exp.get("assay_term_name", 'none')
+    assay = exp.get('assay_term_name', 'none')
     if (assay == 'none'):
         return assay
 
     # Process ChIP-seq
-    # IHEC wants "one of ('ChIP-Seq Input', 'Histone H3K4me1',
+    # IHEC wants 'one of ('ChIP-Seq Input', 'Histone H3K4me1',
     # 'Histone H3K4me3', 'Histone H3K9me3', 'Histone H3K9ac',
-    # 'Histone H3K27me3', 'Histone H3K36me3', etc.)"
-    # I use "ChIP-Seq Input" for control, "Histone <histone name>" for
-    # histones, "ChIP-Seq Input: Transcription factor <TF name>" for everything
+    # 'Histone H3K27me3', 'Histone H3K36me3', etc.)'
+    # I use 'ChIP-Seq Input' for control, 'Histone <histone name>' for
+    # histones, 'ChIP-Seq Input: Transcription factor <TF name>' for everything
     # else
-    if (assay == "ChIP-seq"):
-        target_id = exp.get('target', {}).get("uuid", "none")
-        if (target_id == "none"):
-            return "ChIP-Seq Input"
+    if assay == 'ChIP-seq':
+        target_id = exp.get('target', {}).get('uuid', 'none')
+        if (target_id == 'none'):
+            return 'ChIP-Seq Input'
         target_obj = conn.get(target_id)
         target = target_obj.get('label', 'none')
         if target.lower() == 'control':
-            return "ChIP-Seq Input"
-        if target == "none":
-            return "ChIP-Seq Input"
+            return 'ChIP-Seq Input'
+        if target == 'none':
+            return 'ChIP-Seq Input'
 
         investigated_as = target_obj.get('investigated_as', [])
 
         # Find histone or not
         is_histone = 0
         for investigated in investigated_as:
-            if investigated == "histone":
+            if investigated == 'histone':
                 is_histone = 1
 
         if (is_histone == 1):
-            return "Histone "+target
+            return 'Histone '+target
         else:
-            return "ChIP-Seq Input: Transcription factor "+target
+            return 'ChIP-Seq Input: Transcription factor '+target
+    elif assay == 'RNA-seq':
+        if exp['assay_title'] == 'total RNA-seq':
+            return 'total-RNA-Seq'
+        if exp['assay_title'] == 'polyA plus RNA-seq':
+            return 'mRNA-Seq'
+        return 'RNA-Seq'
 
     # Process other assays
     ihec_exp_type = {
-        "ATAC-seq": "Other",  # "Chromatin Accessibility" failed validator
-        "DNase-seq": "Chromatin Accessibility",
-        "MeDIP-seq": "DNA Methylation",
-        "microRNA-seq": "RNA-Seq",
-        "MRE-seq": "DNA Methylation",
-        "RNA-seq": "RNA-Seq",
-        "RRBS": "DNA Methylation",
-        "whole-genome shotgun bisulfite sequencing": "DNA Methylation"
+        'ATAC-seq': 'Other',  # 'Chromatin Accessibility' failed validator
+        'DNase-seq': 'Chromatin Accessibility',
+        'microRNA-seq': 'smRNA-Seq',
+        'MeDIP-seq': 'DNA Methylation',
+        'MRE-seq': 'DNA Methylation',
+        'RRBS': 'DNA Methylation',
+        'whole-genome shotgun bisulfite sequencing': 'DNA Methylation'
     }
 
-    assay = ihec_exp_type.get(assay, "OTHER")
+    assay = ihec_exp_type.get(assay, 'OTHER')
     return assay
 
 
@@ -195,15 +200,16 @@ def exp_library_strategy(exp):
         return assay
 
     ihec_lib = {
-        "ATAC-seq": "ATAC-seq",
-        "ChIP-seq": "ChIP-Seq",
-        "DNase-seq": "DNase-Hypersensitivity",
-        "MeDIP-seq": "MeDIP-Seq",
-        "microRNA-seq": "RNA-Seq",  # "miRNA-Seq" failed validator
-        "MRE-seq": "MRE-Seq",
-        "RNA-seq": "RNA-Seq",
-        "RRBS": "Bisulfite-Seq",
-        "whole-genome shotgun bisulfite sequencing": "Bisulfite-Seq"
+        'ATAC-seq': 'ATAC-seq',
+        'ChIP-seq': 'ChIP-Seq',
+        'DNase-seq': 'DNase-Hypersensitivity',
+        'MeDIP-seq': 'MeDIP-Seq',
+        'microRNA-seq': 'miRNA-Seq',
+        'microRNA counts': 'miRNA-Seq',
+        'MRE-seq': 'MRE-Seq',
+        'RNA-seq': 'RNA-Seq',
+        'RRBS': 'Bisulfite-Seq',
+        'whole-genome shotgun bisulfite sequencing': 'Bisulfite-Seq',
     }
 
     assay = ihec_lib.get(assay, "OTHER")
@@ -458,7 +464,7 @@ def samples_xml(rr_obj):
 
         donor = biosampleObj.get("donor")
         disease = donor.get('health_status', "Healthy").capitalize()
-        if "human" not in donor:
+        if donor['organism']['name'] != 'human':
             disease = biosampleObj.get(
                 "model_organism_health_status", "Healthy"
             ).capitalize()
@@ -558,12 +564,11 @@ def cellLineXML(biosampleObj):
 
 
 def donor(biosampleObj):
-    donorId = biosampleObj["donor"]
+    donorId = biosampleObj["donor"]['@id']
     if donorId is None:
         return ""
 
     donorObj = conn.get(donorId)
-    donorObj = biosampleObj
     donorInfo = (
         "\t<SAMPLE_ATTRIBUTE><TAG>DONOR_ID</TAG><VALUE>"
         + donorObj.get('accession', "NA")
