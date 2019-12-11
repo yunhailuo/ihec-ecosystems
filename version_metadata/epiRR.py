@@ -113,6 +113,46 @@ def exp_xml(rr_obj):
             + expType
             + "</VALUE></EXPERIMENT_ATTRIBUTE>\n"
         )
+        if expType == 'Transcription Factor':
+            exp_target = expObj['target']
+            experiment_target_property = (
+                '\t\t<EXPERIMENT_ATTRIBUTE>'
+                '<TAG>EXPERIMENT_TARGET_TF</TAG>'
+                '<VALUE>{}</VALUE>'
+                '</EXPERIMENT_ATTRIBUTE>\n'
+            )
+            exp_xml.write(
+                experiment_target_property.format(exp_target['label'])
+            )
+            if 'modifications' in exp_target:
+                modification_string = ', '.join(
+                    '{} at {}{}'.format(
+                        m['modification'], m['amino_acid_code'], m['position']
+                    )
+                    for m in exp_target['modifications']
+                )
+                experiment_target_modification_property = (
+                    '\t\t<EXPERIMENT_ATTRIBUTE>'
+                    '<TAG>EXPERIMENT_TARGET_TF_MODIFICATION</TAG>'
+                    '<VALUE>{}</VALUE>'
+                    '</EXPERIMENT_ATTRIBUTE>\n'
+                )
+                exp_xml.write(
+                    experiment_target_modification_property.format(
+                        modification_string
+                    )
+                )
+        elif expType.startswith('Histone H'):
+            experiment_target_property = (
+                '\t\t<EXPERIMENT_ATTRIBUTE>'
+                '<TAG>EXPERIMENT_TARGET_HISTONE</TAG>'
+                '<VALUE>{}</VALUE>'
+                '</EXPERIMENT_ATTRIBUTE>\n'
+            )
+            exp_xml.write(
+                experiment_target_property.format(expObj['target']['label'])
+            )
+
         exp_xml.write(
             "\t\t<EXPERIMENT_ATTRIBUTE><TAG>EXPERIMENT_ONTOLOGY_URI</TAG>"
             "<VALUE>"
@@ -152,26 +192,16 @@ def exp_type(exp):
     if assay == 'ChIP-seq':
         target_id = exp.get('target', {}).get('uuid', 'none')
         if (target_id == 'none'):
+            assert exp['control_type']
             return 'ChIP-Seq Input'
         target_obj = conn.get(target_id)
-        target = target_obj.get('label', 'none')
-        if target.lower() == 'control':
-            return 'ChIP-Seq Input'
-        if target == 'none':
-            return 'ChIP-Seq Input'
+        target = target_obj['label']
+        is_histone = 'histone' in target_obj['investigated_as']
 
-        investigated_as = target_obj.get('investigated_as', [])
-
-        # Find histone or not
-        is_histone = 0
-        for investigated in investigated_as:
-            if investigated == 'histone':
-                is_histone = 1
-
-        if (is_histone == 1):
-            return 'Histone '+target
+        if is_histone:
+            return 'Histone ' + target
         else:
-            return 'ChIP-Seq Input: Transcription factor '+target
+            return 'Transcription Factor'
     elif assay == 'RNA-seq':
         if exp['assay_title'] == 'total RNA-seq':
             return 'total-RNA-Seq'
@@ -181,7 +211,7 @@ def exp_type(exp):
 
     # Process other assays
     ihec_exp_type = {
-        'ATAC-seq': 'Other',  # 'Chromatin Accessibility' failed validator
+        'ATAC-seq': 'Chromatin Accessibility',
         'DNase-seq': 'Chromatin Accessibility',
         'microRNA-seq': 'smRNA-Seq',
         'MeDIP-seq': 'DNA Methylation',
